@@ -1,0 +1,408 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>:root{color-scheme:light}body{margin:0}</style>
+<title>Denver Weekend</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Instrument+Sans:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  /* Layout: one narrow column. Trip facts on top, then three day blocks on a time rail, then trails and places. */
+  :root {
+    --bg: #F2F5F4;
+    --surface: #FFFFFF;
+    --ink: #14231D;
+    --muted: #55665F;
+    --line: #D5DEDA;
+    --accent: #1E5E49;
+    --accent-ink: #FFFFFF;
+    --day: #E3EFE9;
+    --night: #D3DAE0;
+    --flag: #9A5206;
+    --mod: #D9A21B;
+    --hard: #E2582B;
+
+    --display: "Bricolage Grotesque", "Helvetica Neue", Arial, sans-serif;
+    --body: "Instrument Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+    --mono: "DM Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #0D1512; --surface: #15201B; --ink: #E5EDE9; --muted: #93A59D; --line: #26352F;
+      --accent: #7FD1A8; --accent-ink: #0D1512; --day: #1D3A2F; --night: #1A222B; --flag: #F0B35A;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #0D1512; --surface: #15201B; --ink: #E5EDE9; --muted: #93A59D; --line: #26352F;
+    --accent: #7FD1A8; --accent-ink: #0D1512; --day: #1D3A2F; --night: #1A222B; --flag: #F0B35A;
+    color-scheme: dark;
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font: 400 16px/1.5 var(--body);
+    padding-block: 28px 56px;
+    padding-left: max(16px, env(safe-area-inset-left, 0px));
+    padding-right: max(16px, env(safe-area-inset-right, 0px));
+  }
+  main { max-width: 680px; margin: 0 auto; display: flex; flex-direction: column; gap: 40px; }
+  a { color: var(--accent); text-underline-offset: 3px; }
+  a:focus-visible, input:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; border-radius: 4px; }
+  h1, h2, h3 { font-family: var(--display); text-wrap: balance; margin: 0; line-height: 1.1; }
+  p { margin: 0; }
+  .label { font: 500 12px/1.2 var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+
+  /* header */
+  header { display: flex; flex-direction: column; gap: 14px; }
+  .title-row { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+  h1 { font-size: clamp(3.4rem, 17vw, 5.6rem); font-weight: 800; letter-spacing: -.03em; }
+  .elev { font: 500 13px/1.3 var(--mono); color: var(--muted); text-align: right; padding-bottom: .5rem; }
+  .elev b { display: block; color: var(--accent); font-size: 18px; font-weight: 500; }
+  .sub { font-size: 1.05rem; color: var(--muted); }
+  .sub strong { color: var(--ink); font-weight: 600; }
+
+  .facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
+  .fact { background: var(--surface); padding: 14px 16px; display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+  .fact .big { font: 600 1.15rem/1.2 var(--display); }
+  .fact .small { font-size: .875rem; color: var(--muted); }
+
+  /* day blocks */
+  section { display: flex; flex-direction: column; gap: 16px; }
+  .day-head { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; border-bottom: 2px solid var(--ink); padding-bottom: 8px; }
+  .day-head h2 { font-size: 1.9rem; font-weight: 800; letter-spacing: -.01em; }
+  .day-head .label { margin-left: auto; }
+  .rail { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+  .rail li { display: grid; grid-template-columns: 5.2rem 1fr; gap: 14px; padding: 14px 0; border-bottom: 1px solid var(--line); }
+  .rail li:last-child { border-bottom: 0; }
+  .t { font: 500 13px/1.6 var(--mono); color: var(--accent); font-variant-numeric: tabular-nums; }
+  .rail h3 { font-size: 1.1rem; font-weight: 600; margin-bottom: 2px; }
+  .rail p { color: var(--muted); font-size: .95rem; }
+  .rail p + p { margin-top: 4px; }
+  .rail > li > div { min-width: 0; }
+  .flag { color: var(--flag); font-weight: 600; }
+
+  /* daylight bar for Saturday */
+  .daybar { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px 12px; display: flex; flex-direction: column; gap: 10px; }
+  .bar { position: relative; height: 22px; border-radius: 6px; overflow: hidden; background: linear-gradient(to right, var(--day) 0 71.1%, var(--night) 71.1% 100%); }
+  .bar i { position: absolute; top: 0; bottom: 0; width: 3px; background: var(--accent); left: 65.2%; }
+  .bar-labels { position: relative; height: 1.3em; font: 500 11.5px/1.3 var(--mono); color: var(--muted); }
+  .bar-labels span { position: absolute; top: 0; white-space: nowrap; }
+  .bar-labels .l { left: 0; }
+  .bar-labels .m { left: 71.1%; transform: translateX(-100%); color: var(--flag); }
+  .bar-labels .r { right: 0; }
+  .daybar p { font-size: .9rem; color: var(--muted); }
+
+  /* trails */
+  .trails { gap: 20px; }
+  .trails h2 { font-size: 1.5rem; font-weight: 800; }
+  .pick { background: var(--surface); border: 2px solid var(--accent); border-radius: 10px; padding: 18px; display: flex; flex-direction: column; gap: 12px; }
+  .pick h3 { font-size: 1.35rem; font-weight: 800; }
+  .pick .tag { align-self: flex-start; background: var(--accent); color: var(--accent-ink); font: 500 11.5px/1 var(--mono); letter-spacing: .08em; text-transform: uppercase; padding: 5px 8px; border-radius: 4px; }
+  .pick p { font-size: .95rem; }
+  .pick .go { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 10px; }
+  .pick .go div { background: var(--bg); border-radius: 8px; padding: 12px 14px; font-size: .92rem; }
+  .pick .go b { display: block; font: 500 12px/1.2 var(--mono); letter-spacing: .08em; text-transform: uppercase; margin-bottom: 4px; }
+  .pick .go .yes b { color: var(--accent); }
+  .pick .go .no b { color: var(--flag); }
+  .group { display: flex; flex-direction: column; gap: 4px; }
+  .group h3 { font-size: 1.15rem; font-weight: 600; }
+  .group > p { font-size: .9rem; color: var(--muted); }
+  .trows { list-style: none; margin: 8px 0 0; padding: 0; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; }
+  .trows li { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 4px 16px; padding: 12px 16px; border-bottom: 1px solid var(--line); }
+  .trows li:last-child { border-bottom: 0; }
+  .trows .n { flex: 1 1 230px; min-width: 0; }
+  .trows .n b { display: block; font-weight: 600; font-size: .98rem; line-height: 1.3; }
+  .trows .n span { font-size: .85rem; color: var(--muted); }
+  .trows .m { font: 400 12.5px/1.5 var(--mono); color: var(--muted); font-variant-numeric: tabular-nums; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+  .trows .m .d::before { content: ""; display: inline-block; width: 9px; height: 9px; border-radius: 50%; margin-right: 5px; background: var(--mod); }
+  .trows .m .d.hard::before { background: var(--hard); border-radius: 2px; transform: rotate(45deg) scale(.9); }
+  .trows .m .r { color: var(--ink); }
+
+  /* places */
+  .places { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 12px; }
+  .place { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 16px; display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+  .place h3 { font-size: 1.1rem; font-weight: 600; }
+  .place address { font-style: normal; font-size: .95rem; }
+  .place p { font-size: .9rem; color: var(--muted); }
+  .links { margin-top: auto; padding-top: 8px; display: flex; gap: 14px; flex-wrap: wrap; font-size: .9rem; font-weight: 600; }
+
+  /* checklist */
+  .checks { display: flex; flex-direction: column; gap: 4px; }
+  .checks label { display: flex; gap: 12px; align-items: flex-start; padding: 10px 2px; cursor: pointer; }
+  .checks input { width: 20px; height: 20px; margin: 2px 0 0; accent-color: var(--accent); flex: none; }
+  .checks input:checked + span { color: var(--muted); text-decoration: line-through; }
+
+  h2.plain { font-size: 1.5rem; font-weight: 800; margin-bottom: 4px; }
+  footer { font-size: .85rem; color: var(--muted); border-top: 1px solid var(--line); padding-top: 16px; }
+</style>
+
+<main>
+  <header>
+    <div class="title-row">
+      <h1>Denver</h1>
+      <div class="elev"><b>5,280 ft</b>drink extra water</div>
+    </div>
+    <p class="sub"><strong>Nov 13 to 15, 2026</strong> at the Grand Hyatt Denver, 1750 Welton St</p>
+  </header>
+
+  <div class="facts" aria-label="Trip essentials">
+    <div class="fact">
+      <span class="label">Arrive</span>
+      <span class="big">Fri Nov 13, 10:29 AM</span>
+      <span class="small">United 792 from Washington Dulles</span>
+    </div>
+    <div class="fact">
+      <span class="label">Rental car</span>
+      <span class="big">Sat Nov 14, 8:30 AM to 8:00 PM</span>
+      <span class="small">Chevrolet Trax, 1660 Wynkoop St</span>
+    </div>
+    <div class="fact">
+      <span class="label">Depart</span>
+      <span class="big">Sun Nov 15, 4:10 PM</span>
+      <span class="small">United 421 to Dulles, lands 9:30 PM</span>
+    </div>
+  </div>
+
+  <section id="fri">
+    <div class="day-head"><h2>Friday</h2><span class="label">Nov 13 · city day</span></div>
+    <ul class="rail">
+      <li>
+        <span class="t">10:29 AM</span>
+        <div>
+          <h3>Land at DEN, ride into town</h3>
+          <p>The A Line train runs from the airport to Union Station in about 37 minutes. From there the hotel is a short ride or walk.</p>
+        </div>
+      </li>
+      <li>
+        <span class="t">~Noon</span>
+        <div>
+          <h3>Drop bags at the Hyatt</h3>
+          <p>Check-in usually opens around 4 PM. Ask the front desk to hold bags until then.</p>
+        </div>
+      </li>
+      <li>
+        <span class="t">Afternoon</span>
+        <div>
+          <h3>Meow Wolf Convergence Station</h3>
+          <p>1338 1st St. Plan on 2 to 3 hours. Tickets are timed and sold in advance, so book a slot.</p>
+          <p><a href="https://tickets.meowwolf.com/denver/admission/timed-tickets/" target="_blank" rel="noopener">Buy timed tickets</a></p>
+        </div>
+      </li>
+      <li>
+        <span class="t">Evening</span>
+        <div>
+          <h3>Dinner, then a beer at Woods Boss Brewing</h3>
+          <p>2210 California St, about a 15 minute walk from the hotel. It is open until 10 PM on Friday and describes itself as a music taproom. Its calendar did not show a Friday act, so check it before you walk over.</p>
+        </div>
+      </li>
+      <li>
+        <span class="t">Late</span>
+        <div>
+          <h3>Pool at Tarantula Billiards</h3>
+          <p>1520 Stout St, about a 10 minute walk from the hotel. Listed hours are 11 AM to 2 AM daily.</p>
+        </div>
+      </li>
+    </ul>
+  </section>
+
+  <section id="sat">
+    <div class="day-head"><h2>Saturday</h2><span class="label">Nov 14 · hike day</span></div>
+    <div class="daybar" role="img" aria-label="Car window from 8:30 AM to 8 PM. Daylight ends around 4:40 PM. Plan to be off the trail by 4 PM.">
+      <div class="bar"><i></i></div>
+      <div class="bar-labels"><span class="l">8:30 AM car pickup</span><span class="m">sunset ~4:40</span><span class="r">8 PM return</span></div>
+      <p>Daylight ends before the car is due back. The green mark is 4:00 PM, the time to be off the trail.</p>
+    </div>
+    <ul class="rail">
+      <li>
+        <span class="t">8:30 AM</span>
+        <div>
+          <h3>Pick up the Trax</h3>
+          <p>1660 Wynkoop St, hosted by Zade. It sits near Union Station. Grab coffee and snacks before leaving town.</p>
+        </div>
+      </li>
+      <li>
+        <span class="t">~9:30 AM</span>
+        <div>
+          <h3>On the trail</h3>
+          <p>Mount Sniktau if the forecast allows, otherwise Mount Morrison (see below). Pack water, layers, and a headlamp in case it runs long.</p>
+        </div>
+      </li>
+      <li>
+        <span class="t flag">4:00 PM</span>
+        <div>
+          <h3>Off the trail</h3>
+          <p>Sunset is about 4:40 PM and the mountains get dark quickly after that.</p>
+        </div>
+      </li>
+      <li>
+        <span class="t">By 7:30 PM</span>
+        <div>
+          <h3>Return the car</h3>
+          <p>Due back at 1660 Wynkoop St by 8:00 PM. Check the booking for fuel rules before heading out.</p>
+        </div>
+      </li>
+      <li>
+        <span class="t">~8:30 PM</span>
+        <div>
+          <h3>Live music at Zuni Street Brewing</h3>
+          <p>2355 W 29th Ave in Highland, a short rideshare from the car return. The taproom has live music every Saturday and is open until midnight. Its site does not list set times, so check the music schedule and whether it serves food. If not, eat before you go.</p>
+        </div>
+      </li>
+    </ul>
+  </section>
+
+  <section id="trails" class="trails">
+    <h2>Saturday trail</h2>
+
+    <div class="pick">
+      <span class="tag">First choice, if the weather allows</span>
+      <h3>Mount Sniktau Trail</h3>
+      <p>4.8 rating, Hard, 4 mi round trip, Arapaho National Forest. The trailhead is at Loveland Pass, near 12,000 ft, and the summit is 13,234 ft. Drive is about 75 minutes west on I-70.</p>
+      <p>That height is the problem in mid-November. Expect snow on the trail, strong wind on the ridge, and temperatures well below freezing at the top. You have one day at altitude before this, so go slowly and drink water.</p>
+      <div class="go">
+        <div class="yes"><b>Go if</b>Thursday's forecast near 13,000 ft is dry, wind is under about 25 mph, and it is above about 15°F. These cutoffs are a rule of thumb, so adjust to your gear.</div>
+        <div class="no"><b>Switch to Mount Morrison if</b>it is colder or windier, or you do not have a warm hat, gloves, windproof shell, and traction for your shoes.</div>
+      </div>
+      <p>Check the Loveland Pass and I-70 road status on the morning. Colorado's winter traction law can apply on I-70, so confirm the rental's tires qualify.</p>
+    </div>
+
+    <div class="group">
+      <h3>Backup: lower trails near Denver</h3>
+      <p>Lower elevation, so snow and cold are less likely. Drive times are rough estimates from downtown.</p>
+      <ul class="trows">
+        <li><div class="n"><b>Mount Morrison Trail</b><span>Matthews / Winters Park · best backup, short and steep</span></div><div class="m"><span class="r">4.7</span><span class="d hard">Hard</span><span>4 mi</span><span>~30 min</span></div></li>
+        <li><div class="n"><b>Dakota Ridge Trail</b><span>Matthews / Winters Park</span></div><div class="m"><span class="r">4.4</span><span class="d">Moderate</span><span>5 mi</span><span>~30 min</span></div></li>
+        <li><div class="n"><b>Lookout Mountain Trail</b><span>Windy Saddle Park</span></div><div class="m"><span class="r">4.4</span><span class="d">Moderate</span><span>4 mi</span><span>~30 min</span></div></li>
+        <li><div class="n"><b>Magic Mountain, Argos, Apex, and Enchanted Forest Trail</b><span>Apex Park</span></div><div class="m"><span class="r">4.6</span><span class="d">Moderate</span><span>6 mi</span><span>~30 min</span></div></li>
+        <li><div class="n"><b>Mount Galbraith Loop via Cedar Gulch Trail</b><span>Mount Galbraith Park</span></div><div class="m"><span>details to add</span><span>~35 min</span></div></li>
+        <li><div class="n"><b>Ralston Roost via Black Bear and Horseshoe Loop</b><span>Golden Gate Canyon State Park</span></div><div class="m"><span class="r">4.7</span><span class="d hard">Hard</span><span>4 mi</span><span>~50 min</span></div></li>
+        <li><div class="n"><b>Maxwell Falls via Maxwell Bluffs Trail</b><span>Arapaho National Forest</span></div><div class="m"><span class="r">4.6</span><span class="d">Moderate</span><span>5 mi</span><span>~60 min</span></div></li>
+      </ul>
+    </div>
+
+    <div class="group">
+      <h3>Other high country trails</h3>
+      <p>Same cold problem as Sniktau, so these only work if the forecast is good.</p>
+      <ul class="trows">
+        <li><div class="n"><b>Cupid Peak via Mount Sniktau and Grizzly Peak Trail</b><span>Arapaho National Forest</span></div><div class="m"><span class="r">4.7</span><span class="d hard">Hard</span><span>3 mi</span><span>~75 min</span></div></li>
+        <li><div class="n"><b>Butler Gulch Trail</b><span>Arapaho National Forest</span></div><div class="m"><span class="r">4.8</span><span class="d hard">Hard</span><span>6 mi</span><span>~70 min</span></div></li>
+        <li><div class="n"><b>Blackhawk Peak Trail</b><span>Arapaho National Forest</span></div><div class="m"><span class="r">3.8</span><span class="d hard">Hard</span><span>4 mi</span></div></li>
+        <li><div class="n"><b>Mount Blue Sky and Mount Spalding Trail</b><span>Mount Evans Wilderness · the road is normally closed to cars by November, so likely out</span></div><div class="m"><span class="r">4.7</span><span class="d hard">Hard</span><span>6 mi</span></div></li>
+      </ul>
+    </div>
+  </section>
+
+  <section id="sun">
+    <div class="day-head"><h2>Sunday</h2><span class="label">Nov 15 · slow morning</span></div>
+    <ul class="rail">
+      <li>
+        <span class="t">Morning</span>
+        <div>
+          <h3>Brunch, and Meow Wolf if you skipped it Friday</h3>
+          <p>Hotel checkout is at 11 AM. A 10 AM Meow Wolf entry ends around 1 PM.</p>
+        </div>
+      </li>
+      <li>
+        <span class="t flag">1:15 PM</span>
+        <div>
+          <h3>Leave for the airport</h3>
+          <p>Walk or ride to Union Station and take the A Line. That leaves about two hours before the flight.</p>
+        </div>
+      </li>
+      <li>
+        <span class="t">4:10 PM</span>
+        <div>
+          <h3>United 421 to Dulles</h3>
+          <p>Lands at 9:30 PM.</p>
+        </div>
+      </li>
+    </ul>
+  </section>
+
+  <section id="places">
+    <h2 class="plain">Places</h2>
+    <div class="places">
+      <div class="place">
+        <h3>Grand Hyatt Denver</h3>
+        <address>1750 Welton St, Denver, CO 80202</address>
+        <p>Check-in around 4 PM, checkout 11 AM.</p>
+        <div class="links"><a href="https://www.google.com/maps/search/?api=1&query=Grand+Hyatt+Denver+1750+Welton+St+Denver+CO" target="_blank" rel="noopener">Open in Maps</a></div>
+      </div>
+      <div class="place">
+        <h3>Tarantula Billiards</h3>
+        <address>1520 Stout St, Denver, CO 80202</address>
+        <p>720-932-6666. Open until 2 AM.</p>
+        <div class="links"><a href="https://www.google.com/maps/search/?api=1&query=Tarantula+Billiards+1520+Stout+St+Denver+CO" target="_blank" rel="noopener">Open in Maps</a></div>
+      </div>
+      <div class="place">
+        <h3>Meow Wolf Convergence Station</h3>
+        <address>1338 1st St, Denver, CO 80204</address>
+        <p>Timed tickets start around $39.</p>
+        <div class="links">
+          <a href="https://www.google.com/maps/search/?api=1&query=Meow+Wolf+Convergence+Station+1338+1st+St+Denver+CO" target="_blank" rel="noopener">Open in Maps</a>
+          <a href="https://tickets.meowwolf.com/denver/admission/timed-tickets/" target="_blank" rel="noopener">Tickets</a>
+        </div>
+      </div>
+      <div class="place">
+        <h3>Car pickup and return</h3>
+        <address>1660 Wynkoop St, Denver, CO 80202</address>
+        <p>Chevrolet Trax 2022, Saturday 8:30 AM to 8:00 PM. Host: Zade.</p>
+        <div class="links"><a href="https://www.google.com/maps/search/?api=1&query=1660+Wynkoop+St+Denver+CO+80202" target="_blank" rel="noopener">Open in Maps</a></div>
+      </div>
+      <div class="place">
+        <h3>Woods Boss Brewing</h3>
+        <address>2210 California St, Denver, CO 80205</address>
+        <p>720-642-7177. Open noon to 10 PM Fri and Sat.</p>
+        <div class="links">
+          <a href="https://www.google.com/maps/search/?api=1&query=Woods+Boss+Brewing+2210+California+St+Denver+CO" target="_blank" rel="noopener">Open in Maps</a>
+          <a href="https://www.woodsbossbrewing.com/events" target="_blank" rel="noopener">Music calendar</a>
+        </div>
+      </div>
+      <div class="place">
+        <h3>Zuni Street Brewing</h3>
+        <address>2355 W 29th Ave, Denver, CO 80211</address>
+        <p>Live music Wednesdays and Saturdays. Open noon to midnight Fri and Sat.</p>
+        <div class="links">
+          <a href="https://www.google.com/maps/search/?api=1&query=Zuni+Street+Brewing+2355+W+29th+Ave+Denver+CO" target="_blank" rel="noopener">Open in Maps</a>
+          <a href="https://www.zunistreet.com/" target="_blank" rel="noopener">Music schedule</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="todo">
+    <h2 class="plain">Before we go</h2>
+    <div class="checks">
+      <label><input type="checkbox" id="c-music"><span>Check the Woods Boss and Zuni Street music schedules</span></label>
+      <label><input type="checkbox" id="c-meow"><span>Book Meow Wolf timed tickets</span></label>
+      <label><input type="checkbox" id="c-trail"><span>Decide Sniktau or Mount Morrison from the Thursday forecast</span></label>
+      <label><input type="checkbox" id="c-weather"><span>Check road status and conditions again Saturday morning</span></label>
+      <label><input type="checkbox" id="c-traction"><span>Pack layers, water, headlamp, and traction for shoes</span></label>
+    </div>
+  </section>
+
+  <footer>Hours and prices come from public listings, so confirm them before you go. Boxes above are saved on this device only.</footer>
+</main>
+
+<script>
+  (function () {
+    var key = 'denver-weekend-checks';
+    var boxes = document.querySelectorAll('.checks input');
+    var saved = {};
+    try { saved = JSON.parse(localStorage.getItem(key) || '{}'); } catch (e) {}
+    boxes.forEach(function (b) {
+      b.checked = !!saved[b.id];
+      b.addEventListener('change', function () {
+        saved[b.id] = b.checked;
+        try { localStorage.setItem(key, JSON.stringify(saved)); } catch (e) {}
+      });
+    });
+  })();
+</script>
+
+</html>
